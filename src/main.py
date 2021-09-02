@@ -1,14 +1,24 @@
+import io
+import sys
 from io import StringIO, BytesIO
 
 import asyncio
 import requests
 import os
 import csv
+import logging
+from pythonjsonlogger import jsonlogger
 import paramiko
+
+logger = logging.getLogger("app")
+logger.setLevel(logging.DEBUG)
+logHandler = logging.StreamHandler(sys.stdout)
+logHandler.setFormatter(jsonlogger.JsonFormatter())
+logger.addHandler(logHandler)
 
 
 def print_hei(name):
-    print(f'Hei, {name}')
+    logger.info(f'Hei, {name}')
 
 
 async def hent_access_token():
@@ -17,7 +27,7 @@ async def hent_access_token():
     client_secret = os.getenv("AZURE_APP_CLIENT_SECRET")
     scope = os.getenv("SPORBAR_CLIENT_ID")
 
-    response = await requests.post(
+    response = requests.post(
         token_url,
         data={
             "client_id": client_id,
@@ -33,26 +43,18 @@ async def hent_access_token():
     return response["access_token"]
 
 
-async def hent_vedtaksperioder(access_token: str, fødselsnumre: list[str]):
-    response = await requests.post(
+async def hent_vedtaksperioder(access_token: str, fødselsnumre: list[str]) -> list[dict]:
+    response = requests.post(
         "http://sporbar.tbd.svc.nais.local/api/v1/vedtak",
         json=fødselsnumre,
         headers={
             "Accept": "application/json",
+            "Content-Type": "application/json",
             "Authorization": f"Bearer {access_token}"
         }
     ).json()
 
     return response
-
-
-def hent_fødselsnumre_fra_fil(path):
-    fødselsnumre = []
-    with open(path, "r") as csvfile:
-        csv_reader = csv.reader(csvfile)
-        for row in csv_reader:
-            fødselsnumre += row
-    return fødselsnumre
 
 
 def result_file_name(file_name: str):
@@ -74,10 +76,12 @@ def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, lis
     for file in files:
         fødselsnumre = []
         with BytesIO() as csvfile:
+            logger.info(f"Leser inputfil {file}")
             sftp_client.getfo(f"inbound/{file}", csvfile)
-            csv_reader = csv.reader(csvfile)
+            csvfile.seek(0)
+            csv_reader = csv.reader(io.TextIOWrapper(csvfile))
             for row in csv_reader:
-                fødselsnumre += row
+                fødselsnumre.append(row[0])
         forespørsler[file] = fødselsnumre
 
     client.close()
@@ -91,13 +95,19 @@ def skriv_resultat_til_filslusa(host: str, brukernavn: str, file: str, output: s
     client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename="/id_ed25519"))
     sftp_client = client.open_sftp()
 
-    sftp_client.putfo(StringIO(output), f"outbound/{result_file_name(file)}")
+    sftp_client.putfo(BytesIO(output.encode("UTF-8")), f"outbound/{result_file_name(file)}")
 
     client.close()
 
 
-def map_vedtaksperiode_resultat(input: dict) -> str:
-    return "TODO"
+def map_vedtaksperiode_resultat(input: list[dict]):
+    with StringIO() as csv_out:
+        writer = csv.writer(csv_out)
+
+        writer.writerow(["fødselsnummer", "fom", "tom", "grad"])
+        for vedtak in input:
+            writer.writerow([vedtak["fødselsnummer"], vedtak["fom"], vedtak["tom"], vedtak["grad"]])
+        return csv_out.getvalue()
 
 
 async def håndter_forespørsler_fra_filslusa(host: str, brukernavn: str):
@@ -111,6 +121,5 @@ async def håndter_forespørsler_fra_filslusa(host: str, brukernavn: str):
 if __name__ == '__main__':
     print_hei('Hege')
     host = "sftp.nav.no"
-    os.system("ls -lah /")
     asyncio.run(håndter_forespørsler_fra_filslusa(host, "denvercoder9"))
 

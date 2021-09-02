@@ -10,8 +10,18 @@ services:
     ports:
       - "2222:22"
     command: denvercoder9::1001 denvercoder10::1002
+  sporbar.tbd.svc.nais.local:
+    build: mockserver
+    environment:
+      FLASK_RUN_PORT: "80"
+      FLASK_RUN_HOST: "0.0.0.0"
   spissnok:
     build: .
+    environment:
+      AZURE_OPENID_CONFIG_TOKEN_ENDPOINT: http://sporbar.tbd.svc.nais.local/token
+      AZURE_APP_CLIENT_ID: wowclientid
+      AZURE_APP_CLIENT_SECRET: wowsecret
+      SPORBAR_CLIENT_ID: wowscopeclientid
     volumes:
       - ./testresources/.ssh/id_ed25519:/id_ed25519:ro
       - ./testresources/known_hosts:/known_hosts:ro
