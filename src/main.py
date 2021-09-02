@@ -1,3 +1,6 @@
+from io import StringIO, BytesIO
+
+import asyncio
 import requests
 import os
 import csv
@@ -52,25 +55,62 @@ def hent_fødselsnumre_fra_fil(path):
     return fødselsnumre
 
 
-def hent_fødselsnumre_fra_filslusa(host: str, path: str):
-    fødselsnumre = []
+def result_file_name(file_name: str):
+    return file_name
 
+
+def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, list[str]]:
     client = paramiko.SSHClient()
-    client.load_system_host_keys()
-    client.connect(host)
+    client.load_host_keys("/known_hosts")
+    client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename="/id_ed25519"))
     sftp_client = client.open_sftp()
 
-    files = sftp_client.listdir(path=path)
+    inbound = sftp_client.listdir(path="inbound")
+    outbound = sftp_client.listdir(path="outbound")
+    files = [file for file in inbound if result_file_name(file) not in outbound]
+
+    forespørsler = {}
 
     for file in files:
-        with open(file, "r") as csvfile:
+        fødselsnumre = []
+        with BytesIO() as csvfile:
+            sftp_client.getfo(f"inbound/{file}", csvfile)
             csv_reader = csv.reader(csvfile)
             for row in csv_reader:
                 fødselsnumre += row
+        forespørsler[file] = fødselsnumre
 
-    return fødselsnumre
+    client.close()
+
+    return forespørsler
+
+
+def skriv_resultat_til_filslusa(host: str, brukernavn: str, file: str, output: str):
+    client = paramiko.SSHClient()
+    client.load_host_keys("/known_hosts")
+    client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename="/id_ed25519"))
+    sftp_client = client.open_sftp()
+
+    sftp_client.putfo(StringIO(output), f"outbound/{result_file_name(file)}")
+
+    client.close()
+
+
+def map_vedtaksperiode_resultat(input: dict) -> str:
+    return "TODO"
+
+
+async def håndter_forespørsler_fra_filslusa(host: str, brukernavn: str):
+    inbound = hent_fødselsnumre_fra_filslusa(host, brukernavn)
+    access_token = await hent_access_token()
+    for file, fødselsnumre in inbound.items():
+        vedtaksperioder = await hent_vedtaksperioder(access_token, fødselsnumre)
+        skriv_resultat_til_filslusa(host, brukernavn, file, map_vedtaksperiode_resultat(vedtaksperioder))
 
 
 if __name__ == '__main__':
     print_hei('Hege')
-    print(hent_fødselsnumre_fra_fil("test.csv"))
+    host = "sftp.nav.no"
+    os.system("ls -lah /")
+    asyncio.run(håndter_forespørsler_fra_filslusa(host, "denvercoder9"))
+
