@@ -1,6 +1,6 @@
 # Spissnok
 
-![Bygg og deploy](https://github.com/navikt/helse-spissnok/workflows/Bygg%20og%20deploy/badge.svg)
+![Bygg og deploy](https://github.com/navikt/helse-spissnok/workflows/master/badge.svg)
 
 Svarer på forespørsler om vedtak via filsluse
 

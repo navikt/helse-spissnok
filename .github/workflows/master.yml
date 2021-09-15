@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: create image tag
-      run: echo "IMAGE=docker.pkg.github.com/${{ github.repository }}/spokelse:$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
+      run: echo "IMAGE=docker.pkg.github.com/${{ github.repository }}/spissnok:$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
     - uses: actions/checkout@v1
     - name: build docker image
       run: docker build . --pull -t ${IMAGE}
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create image tag
-        run: echo "IMAGE=docker.pkg.github.com/${{ github.repository }}/spokelse:$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
+        run: echo "IMAGE=docker.pkg.github.com/${{ github.repository }}/spissnok:$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
       - uses: actions/checkout@v1
       - uses: nais/deploy/actions/deploy@v1
         env:
@@ -39,7 +39,7 @@ jobs:
 #    runs-on: ubuntu-latest
 #    steps:
 #      - name: Create image tag
-#        run: echo "IMAGE=docker.pkg.github.com/${{ github.repository }}/spokelse:$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
+#        run: echo "IMAGE=docker.pkg.github.com/${{ github.repository }}/spissnok:$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
 #      - uses: actions/checkout@v1
 #      - uses: nais/deploy/actions/deploy@v1
 #        env:
