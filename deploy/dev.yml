@@ -31,4 +31,6 @@ spec:
       mountPath: /var/run/ssh-keys
   env:
     - name: SPORBAR_CLIENT_ID
-      value: api://dev-fss.tbd.sporbar/.default
+      value: api://dev-fss.tbd.spokelse/.default
+    - name: SFTP_HOST
+      value: sftp-q.nav.no

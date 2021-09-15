@@ -22,6 +22,7 @@ ssh_key = "/var/run/ssh-keys/id_ed25519"
 def print_hei(name):
     logger.info(f'Hei, {name}')
 
+
 def print_ha_det(name):
     logger.info(f'Ha det, {name}')
 
@@ -50,7 +51,7 @@ async def hent_access_token():
 
 async def hent_vedtaksperioder(access_token: str, fødselsnumre: list[str]) -> list[dict]:
     response = requests.post(
-        "http://sporbar.tbd.svc.nais.local/api/v1/vedtak",
+        "http://spokelse.tbd.svc.nais.local/utbetalinger",
         json=fødselsnumre,
         headers={
             "Accept": "application/json",
@@ -62,8 +63,8 @@ async def hent_vedtaksperioder(access_token: str, fødselsnumre: list[str]) -> l
     return response
 
 
-def result_file_name(file_name: str):
-    return file_name
+def utgående_fil(filnavn: str):
+    return filnavn
 
 
 def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, list[str]]:
@@ -74,33 +75,36 @@ def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, lis
 
     inbound = sftp_client.listdir(path="inbound")
     outbound = sftp_client.listdir(path="outbound")
-    files = [file for file in inbound if result_file_name(file) not in outbound]
+    filer = [fil for fil in inbound if utgående_fil(fil) not in outbound]
 
     forespørsler = {}
 
-    for file in files:
+    for fil in filer:
         fødselsnumre = []
-        with BytesIO() as csvfile:
-            logger.info(f"Leser inputfil {file}")
-            sftp_client.getfo(f"inbound/{file}", csvfile)
-            csvfile.seek(0)
-            csv_reader = csv.reader(io.TextIOWrapper(csvfile))
-            for row in csv_reader:
-                fødselsnumre.append(row[0])
-        forespørsler[file] = fødselsnumre
+        with BytesIO() as csvfil:
+            logger.info(f"Leser inputfil {fil}")
+            sftp_client.getfo(f"inbound/{fil}", csvfil)
+            csvfil.seek(0)
+            csv_reader = csv.reader(io.TextIOWrapper(csvfil))
+            for rad in csv_reader:
+                fødselsnumre.append(rad[0])
+        forespørsler[fil] = fødselsnumre
 
     client.close()
 
     return forespørsler
 
 
-def skriv_resultat_til_filslusa(host: str, brukernavn: str, file: str, output: str):
+def skriv_resultat_til_filslusa(host: str, brukernavn: str, fil: str, output: str):
     client = paramiko.SSHClient()
     client.load_host_keys("/known_hosts")
     client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename=ssh_key))
     sftp_client = client.open_sftp()
 
-    sftp_client.putfo(BytesIO(output.encode("UTF-8")), f"outbound/{result_file_name(file)}")
+    utgående_filnavn = utgående_fil(fil)
+
+    sftp_client.putfo(BytesIO(output.encode("UTF-8")), f"outbound/{utgående_filnavn}")
+    logger.info(f"Skriver {utgående_filnavn} til slusa")
 
     client.close()
 
@@ -119,17 +123,26 @@ async def håndter_forespørsler_fra_filslusa(host: str, brukernavn: str):
     inbound = hent_fødselsnumre_fra_filslusa(host, brukernavn)
     access_token = await hent_access_token()
     for file, fødselsnumre in inbound.items():
+        logger.info(f"Håndterer fil {file}")
         vedtaksperioder = await hent_vedtaksperioder(access_token, fødselsnumre)
         skriv_resultat_til_filslusa(host, brukernavn, file, map_vedtaksperiode_resultat(vedtaksperioder))
 
 
 if __name__ == '__main__':
     print_hei('Hege')
-    host = "sftp.nav.no"
-    with open("/config.json") as config_json:
-        jason = json.load(config_json)
+    try:
+        sftp_host = os.getenv("SFTP_HOST")
 
-    for sluse in jason:
-        asyncio.run(håndter_forespørsler_fra_filslusa(host, sluse["bruker"]))
+        with open("/config.json") as config_json:
+            jason = json.load(config_json)
 
+        for sluse in jason:
+            bruker = sluse["bruker"]
+            logger.info(f"Håndterer forespørsel for {bruker}")
+            asyncio.run(håndter_forespørsler_fra_filslusa(sftp_host, bruker))
+            logger.info(f"Fullført håndtering av forespørsel for {bruker}")
+    except Exception:
+        logger.exception("Spissnok har ikke spist nok :(")
+
+    logger.info("You sluse, you luse 🥴")
     print_ha_det("Hege")
