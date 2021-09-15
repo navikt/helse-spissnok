@@ -17,6 +17,7 @@ logHandler = logging.StreamHandler(sys.stdout)
 logHandler.setFormatter(jsonlogger.JsonFormatter())
 logger.addHandler(logHandler)
 ssh_key = "/var/run/ssh-keys/id_ed25519"
+known_hosts = "/var/run/ssh-keys/known_hosts"
 
 
 def print_hei(name):
@@ -69,7 +70,7 @@ def utgående_fil(filnavn: str):
 
 def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, list[str]]:
     client = paramiko.SSHClient()
-    client.load_host_keys("/known_hosts")
+    client.load_host_keys(known_hosts)
     client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename=ssh_key))
     sftp_client = client.open_sftp()
 
@@ -97,7 +98,7 @@ def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, lis
 
 def skriv_resultat_til_filslusa(host: str, brukernavn: str, fil: str, output: str):
     client = paramiko.SSHClient()
-    client.load_host_keys("/known_hosts")
+    client.load_host_keys(known_hosts)
     client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename=ssh_key))
     sftp_client = client.open_sftp()
 

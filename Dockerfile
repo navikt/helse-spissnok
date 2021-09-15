@@ -7,7 +7,6 @@ RUN useradd --system --home-dir "/home/apprunner2" --uid 1069 --gid apprunner2 a
 RUN mkdir -p "/home/apprunner2"
 RUN chown 1069:1069 /home/apprunner2
 USER apprunner2
-RUN ls -lah /home/apprunner2
 RUN pip install --user -r requirements.txt
 
 COPY src/ .
