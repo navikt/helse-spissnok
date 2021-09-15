@@ -45,9 +45,12 @@ async def hent_access_token():
         headers={
             "Accept": "application/json"
         }
-    ).json()
+    )
 
-    return response["access_token"]
+    if not response.ok:
+        raise Exception(f"Got non-ok HTTP-response when getting access_token:\n{response.text}")
+
+    return response.json()["access_token"]
 
 
 async def hent_vedtaksperioder(access_token: str, fødselsnumre: list[str]) -> list[dict]:
