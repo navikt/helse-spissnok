@@ -1,4 +1,5 @@
 import io
+import json
 import sys
 from io import StringIO, BytesIO
 
@@ -15,10 +16,14 @@ logger.setLevel(logging.DEBUG)
 logHandler = logging.StreamHandler(sys.stdout)
 logHandler.setFormatter(jsonlogger.JsonFormatter())
 logger.addHandler(logHandler)
+ssh_key = "/var/run/ssh-keys/id_ed25519"
 
 
 def print_hei(name):
     logger.info(f'Hei, {name}')
+
+def print_ha_det(name):
+    logger.info(f'Ha det, {name}')
 
 
 async def hent_access_token():
@@ -64,7 +69,7 @@ def result_file_name(file_name: str):
 def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, list[str]]:
     client = paramiko.SSHClient()
     client.load_host_keys("/known_hosts")
-    client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename="/id_ed25519"))
+    client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename=ssh_key))
     sftp_client = client.open_sftp()
 
     inbound = sftp_client.listdir(path="inbound")
@@ -92,7 +97,7 @@ def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, lis
 def skriv_resultat_til_filslusa(host: str, brukernavn: str, file: str, output: str):
     client = paramiko.SSHClient()
     client.load_host_keys("/known_hosts")
-    client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename="/id_ed25519"))
+    client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename=ssh_key))
     sftp_client = client.open_sftp()
 
     sftp_client.putfo(BytesIO(output.encode("UTF-8")), f"outbound/{result_file_name(file)}")
@@ -121,5 +126,10 @@ async def håndter_forespørsler_fra_filslusa(host: str, brukernavn: str):
 if __name__ == '__main__':
     print_hei('Hege')
     host = "sftp.nav.no"
-    asyncio.run(håndter_forespørsler_fra_filslusa(host, "denvercoder9"))
+    with open("/config.json") as config_json:
+        jason = json.load(config_json)
 
+    for sluse in jason:
+        asyncio.run(håndter_forespørsler_fra_filslusa(host, sluse["bruker"]))
+
+    print_ha_det("Hege")
