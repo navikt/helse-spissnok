@@ -11,10 +11,18 @@ import logging
 from pythonjsonlogger import jsonlogger
 import paramiko
 
+
+class CustomJsonFormatter(jsonlogger.JsonFormatter):
+    def add_fields(self, log_record, record, message_dict):
+        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
+        log_record['level'] = record.levelname.capitalize()
+        print(log_record)
+
+
 logger = logging.getLogger("app")
 logger.setLevel(logging.DEBUG)
 logHandler = logging.StreamHandler(sys.stdout)
-logHandler.setFormatter(jsonlogger.JsonFormatter())
+logHandler.setFormatter(CustomJsonFormatter(json_ensure_ascii=False))
 logger.addHandler(logHandler)
 ssh_key = "/var/run/ssh-keys/id_ed25519"
 known_hosts = "/var/run/ssh-keys/known_hosts"
