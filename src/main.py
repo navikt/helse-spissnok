@@ -98,6 +98,7 @@ def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, lis
             sftp_client.getfo(f"inbound/{fil}", csvfil)
             csvfil.seek(0)
             csv_reader = csv.reader(io.TextIOWrapper(csvfil))
+            next(csv_reader)
             for rad in csv_reader:
                 fødselsnumre.append(rad[0])
         forespørsler[fil] = fødselsnumre
@@ -125,9 +126,12 @@ def map_vedtaksperiode_resultat(input: list[dict]):
     with StringIO() as csv_out:
         writer = csv.writer(csv_out)
 
-        writer.writerow(["fødselsnummer", "fom", "tom", "grad"])
+        writer.writerow(
+            ["fødselsnummer", "fom", "tom", "grad", "gjenståendeSykedager", "utbetaltTidspunkt", "refusjonstype"])
         for vedtak in input:
-            writer.writerow([vedtak["fødselsnummer"], vedtak["fom"], vedtak["tom"], vedtak["grad"]])
+            writer.writerow(
+                [vedtak["fødselsnummer"], vedtak["fom"], vedtak["tom"], vedtak["grad"], vedtak["gjenståendeSykedager"],
+                 vedtak["utbetaltTidspunkt"], vedtak["refusjonstype"]])
         return csv_out.getvalue()
 
 
