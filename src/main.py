@@ -55,7 +55,7 @@ async def hent_access_token():
     )
 
     if not response.ok:
-        raise Exception(f"Got non-ok HTTP-response when getting access_token:\n{response.text}")
+        raise Exception(f"Fikk ikke-ok HTTP-respons under henting av access_token:\n{response.text}")
 
     return response.json()["access_token"]
 
@@ -69,9 +69,12 @@ async def hent_vedtaksperioder(access_token: str, fødselsnumre: list[str]) -> l
             "Content-Type": "application/json",
             "Authorization": f"Bearer {access_token}"
         }
-    ).json()
+    )
 
-    return response
+    if not response.ok:
+        raise Exception(f"Fikk ikke-ok HTTP-Respons under henting av utbetalinger:\n{response.text}")
+
+    return response.json()
 
 
 def utgående_fil(filnavn: str):

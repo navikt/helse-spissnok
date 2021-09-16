@@ -7,11 +7,12 @@ services:
       - ./testresources/inbound:/home/srvSykepengevedtakSPK/inbound
       - ./testresources/outbound:/home/srvSykepengevedtakKLP/outbound
       - ./testresources/inbound:/home/srvSykepengevedtakKLP/inbound
-      - ./testresources/.ssh/id_ed25519.pub:/home/denvercoder9/.ssh/keys/id_ed25519.pub:ro
+      - ./testresources/.ssh/id_ed25519.pub:/home/srvSykepengevedtakSPK/.ssh/keys/id_ed25519.pub:ro
+      - ./testresources/.ssh/id_ed25519.pub:/home/srvSykepengevedtakKLP/.ssh/keys/id_ed25519.pub:ro
       - ./testresources/.ssh/ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key:ro
     ports:
       - "2222:22"
-    command: denvercoder9::1001 denvercoder10::1002
+    command: srvSykepengevedtakSPK::1001 srvSykepengevedtakKLP::1002
   spokelse.tbd.svc.nais.local:
     build: mockserver
     environment:
