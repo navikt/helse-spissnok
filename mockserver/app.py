@@ -1,3 +1,4 @@
+import datetime
 import sys
 
 from flask import Flask, jsonify, request
@@ -22,7 +23,10 @@ def hent_vedtak():
             "fødselsnummer": fødselsnummer,
             "fom": (date.today() - timedelta(days=14)).isoformat(),
             "tom": date.today().isoformat(),
-            "grad": 69
+            "grad": 69,
+            "gjenståendeSykedager": 420,
+            "utbetaltTidspunkt": datetime.datetime.now().isoformat(),
+            "refusjonstype": "REFUSJON_TIL_ARBEIDSGIVER"
         })
     print(result, file=sys.stderr)
     return jsonify(result)
