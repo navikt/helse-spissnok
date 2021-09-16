@@ -16,7 +16,6 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
         super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
         log_record['level'] = record.levelname.capitalize()
-        print(log_record)
 
 
 logger = logging.getLogger("app")
