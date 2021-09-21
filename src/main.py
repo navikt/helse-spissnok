@@ -4,6 +4,7 @@ import sys
 from io import StringIO, BytesIO
 
 import asyncio
+from hashlib import sha256
 import requests
 import os
 import csv
@@ -122,7 +123,11 @@ def skriv_resultat_til_filslusa(host: str, brukernavn: str, fil: str, output: st
 
     utgående_filnavn = utgående_fil(fil)
 
-    sftp_client.putfo(BytesIO(output.encode("UTF-8")), f"outbound/{utgående_filnavn}")
+    data = output.encode("UTF-8")
+    hash = sha256(data).hexdigest().encode("UTF-8")
+
+    sftp_client.putfo(BytesIO(hash), f"outbound/{utgående_filnavn}.sha256")
+    sftp_client.putfo(BytesIO(data), f"outbound/{utgående_filnavn}")
     logger.info(f"Skriver {utgående_filnavn} til slusa")
 
     client.close()

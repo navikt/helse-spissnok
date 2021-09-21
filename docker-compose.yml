@@ -7,10 +7,13 @@ services:
       - ./testresources/inbound:/home/srvSykepengevedtakSPK/inbound
       - ./testresources/outbound:/home/srvSykepengevedtakKLP/outbound
       - ./testresources/inbound:/home/srvSykepengevedtakKLP/inbound
+      - ./testresources/outbound:/home/srvSykepengevedtakAFP/outbound
+      - ./testresources/inbound:/home/srvSykepengevedtakAFP/inbound
       - ./testresources/.ssh/id_ed25519.pub:/home/srvSykepengevedtakSPK/.ssh/keys/id_ed25519.pub:ro
       - ./testresources/.ssh/id_ed25519.pub:/home/srvSykepengevedtakKLP/.ssh/keys/id_ed25519.pub:ro
+      - ./testresources/.ssh/id_ed25519.pub:/home/srvSykepengevedtakAFP/.ssh/keys/id_ed25519.pub:ro
       - ./testresources/.ssh/ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key:ro
-    command: srvSykepengevedtakKLP::1001 srvSykepengevedtakSPK::1002
+    command: srvSykepengevedtakKLP::1001 srvSykepengevedtakSPK::1002 srvSykepengevedtakAFP::1003
   spokelse.tbd.svc.nais.local:
     build: mockserver
     environment:
