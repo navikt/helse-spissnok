@@ -10,9 +10,7 @@ services:
       - ./testresources/.ssh/id_ed25519.pub:/home/srvSykepengevedtakSPK/.ssh/keys/id_ed25519.pub:ro
       - ./testresources/.ssh/id_ed25519.pub:/home/srvSykepengevedtakKLP/.ssh/keys/id_ed25519.pub:ro
       - ./testresources/.ssh/ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key:ro
-    ports:
-      - "2222:22"
-    command: srvSykepengevedtakSPK::1001 srvSykepengevedtakKLP::1002
+    command: srvSykepengevedtakKLP::1001 srvSykepengevedtakSPK::1002
   spokelse.tbd.svc.nais.local:
     build: mockserver
     environment:
@@ -21,7 +19,7 @@ services:
   spissnok:
     build: .
     environment:
-      AZURE_OPENID_CONFIG_TOKEN_ENDPOINT: http://sporbar.tbd.svc.nais.local/token
+      AZURE_OPENID_CONFIG_TOKEN_ENDPOINT: http://spokelse.tbd.svc.nais.local/token
       AZURE_APP_CLIENT_ID: wowclientid
       AZURE_APP_CLIENT_SECRET: wowsecret
       SPORBAR_CLIENT_ID: wowscopeclientid

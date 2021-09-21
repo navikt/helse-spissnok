@@ -13,7 +13,7 @@ def fetch_token():
     return {"access_token": "SUPDOGE"}
 
 
-@app.route("/api/v1/vedtak", methods=["POST"])
+@app.route("/utbetalinger", methods=["POST"])
 def hent_vedtak():
     json = request.get_json()
     result = []
