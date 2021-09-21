@@ -3,6 +3,8 @@ build
 venv
 
 testresources/outbound
--testresources/outbound/gitkeep
+-testresources/outbound/.gitkeep
+testresources/inbound
+-testresources/inbound/.gitkeep
 
 __pycache__/

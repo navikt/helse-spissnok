@@ -124,11 +124,22 @@ def skriv_resultat_til_filslusa(host: str, brukernavn: str, fil: str, output: st
     utgående_filnavn = utgående_fil(fil)
 
     data = output.encode("UTF-8")
-    hash = sha256(data).hexdigest().encode("UTF-8")
+    hash = sha256(data).hexdigest()
 
-    sftp_client.putfo(BytesIO(hash), f"outbound/{utgående_filnavn}.sha256")
-    sftp_client.putfo(BytesIO(data), f"outbound/{utgående_filnavn}")
     logger.info(f"Skriver {utgående_filnavn} til slusa")
+    sftp_client.putfo(BytesIO(hash.encode("UTF-8")), f"outbound/{utgående_filnavn}.sha256")
+    sftp_client.putfo(BytesIO(data), f"outbound/{utgående_filnavn}")
+
+    logger.info("Verifserer at hash til utgående melding er lik den originale hashen")
+    with BytesIO() as remote_csv:
+        sftp_client.getfo(f"outbound/{utgående_filnavn}", remote_csv)
+        remote_csv.seek(0)
+        remote_hash = sha256(remote_csv.read()).hexdigest()
+        if remote_hash == hash:
+            logger.info(f"Hashen til utgående melding er lik original, sletter inbound/{fil}")
+            sftp_client.remove(f"inbound/{fil}")
+        else:
+            logger.error(f"Hashen for utgående melding er ulik den originale hashen⁉, original={hash} remote={remote_hash}")
 
     client.close()
 
