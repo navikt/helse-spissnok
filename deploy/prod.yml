@@ -7,7 +7,7 @@ metadata:
     team: tbd
 spec:
   image: {{image}}
-  schedule: "00 14 * * */1"
+#  schedule: "00 14 * * */1"
   resources:
     limits:
       cpu: 200m
