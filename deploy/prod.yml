@@ -5,6 +5,8 @@ metadata:
   namespace: tbd
   labels:
     team: tbd
+  annotations:
+    ginuudan.nais.io/dwindle: "true"
 spec:
   image: {{image}}
   schedule: "00 14 * * */1"
