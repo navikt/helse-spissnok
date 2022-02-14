@@ -6,7 +6,7 @@ metadata:
   labels:
     team: tbd
   annotations:
-    ginuudan.nais.io/dwindle: "true"
+    nais.io/naisjob: "true"
 spec:
   image: {{image}}
   schedule: "00 14 * * */1"
