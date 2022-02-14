@@ -6,5 +6,7 @@ testresources/outbound
 -testresources/outbound/.gitkeep
 testresources/inbound
 -testresources/inbound/.gitkeep
+testresources/logs
+-testresources/logs/.gitkeep
 
 __pycache__/

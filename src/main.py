@@ -9,14 +9,17 @@ import requests
 import os
 import csv
 import logging
+from logging.handlers import RotatingFileHandler
 from pythonjsonlogger import jsonlogger
 import paramiko
+from datetime import datetime
 
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
         super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
         log_record['level'] = record.levelname.capitalize()
+        log_record['@timestamp'] = datetime.now().isoformat()
 
 
 logger = logging.getLogger("app")
@@ -24,6 +27,13 @@ logger.setLevel(logging.DEBUG)
 logHandler = logging.StreamHandler(sys.stdout)
 logHandler.setFormatter(CustomJsonFormatter(json_ensure_ascii=False))
 logger.addHandler(logHandler)
+
+sikker_logg = logging.getLogger("sikker_logg")
+sikker_logg.setLevel(logging.INFO)
+sikker_logg_handler = RotatingFileHandler("/secure-logs/secure.log", maxBytes=69000000, backupCount=5)
+sikker_logg_handler.setFormatter(CustomJsonFormatter(json_ensure_ascii=False))
+sikker_logg.addHandler(sikker_logg_handler)
+
 ssh_key = "/var/run/ssh-keys/id_ed25519"
 known_hosts = "/var/run/ssh-keys/known_hosts"
 
@@ -107,7 +117,10 @@ def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, lis
             csv_reader = csv.reader(io.TextIOWrapper(csvfil))
             next(csv_reader)
             for rad in csv_reader:
-                fødselsnumre.append(rad[0])
+                fødselsnummer = rad[0]
+                sikker_logg.info(f"Henter informasjon for \"{fødselsnummer}\" "
+                                 + f"hex={fødselsnummer.encode('UTF-8').hex(':')}")
+                fødselsnumre.append(fødselsnummer)
         forespørsler[fil] = fødselsnumre
 
     client.close()
@@ -151,6 +164,8 @@ def map_vedtaksperiode_resultat(input: list[dict]):
         writer.writerow(
             ["fødselsnummer", "fom", "tom", "grad", "gjenståendeSykedager", "utbetaltTidspunkt", "refusjonstype"])
         for vedtak in input:
+            sikker_logg.info(f"sender vedtak for {vedtak['fødselsnummer']}, fom={vedtak['fom']},"
+                             + f" tom={vedtak['tom']}, refusjonstype={vedtak['refusjonstype']}")
             writer.writerow(
                 [vedtak["fødselsnummer"], vedtak["fom"], vedtak["tom"], vedtak["grad"], vedtak["gjenståendeSykedager"],
                  vedtak["utbetaltTidspunkt"], vedtak["refusjonstype"]])
