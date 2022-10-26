@@ -32,6 +32,12 @@ docker-compose setter opp:
 * en mock som returnerer samme data som spokelse ville gjort
 * en instanse av spissnok som peker mot sftp serveren og spokelse-mocken
 
+## Ellers da?
+
+Filmottak slik vi gjør det i NAV er dokumentert på confluence: https://confluence.adeo.no/display/linuxdrift/Ekstern+filsluse
+
+
+
 # Henvendelser
 
 Spørsmål knyttet til koden eller prosjektet kan stilles som issues her på GitHub.
