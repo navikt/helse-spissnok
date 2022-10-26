@@ -18,6 +18,12 @@ Eventuelt:
 ```
 som en kommando
 
+## Bug:
+Det kan godt være at noen av mappene `prepare_slusing.sh` jobber med lastes ned som filer, ikke mapper, pga. git og gøy og galskap. Slett de filene, og lag mapper i stedet.
+
+## Bug2:
+Det ser ikke ut som om all testdataen er lagt inn i git
+
 ## Hvordan fungerer det?
 `./prepare_slusing.sh` rydder opp i outbound-mapper og kopierer inputfil inn i `testresources/inbound`
 

@@ -37,15 +37,6 @@ sikker_logg.addHandler(sikker_logg_handler)
 ssh_key = "/var/run/ssh-keys/id_ed25519"
 known_hosts = "/var/run/ssh-keys/known_hosts"
 
-
-def print_hei(name):
-    logger.info(f'Hei, {name}')
-
-
-def print_ha_det(name):
-    logger.info(f'Ha det, {name}')
-
-
 async def hent_access_token():
     token_url = os.getenv("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")
     client_id = os.getenv("AZURE_APP_CLIENT_ID")
@@ -103,8 +94,11 @@ def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, lis
     sftp_client = client.open_sftp()
 
     inbound = sftp_client.listdir(path="inbound")
+    logger.info(f"{len(inbound)} inbound filer")
     outbound = sftp_client.listdir(path="outbound")
+    logger.info(f"{len(outbound)} outbound filer")
     filer = [fil for fil in inbound if utgående_fil(fil) not in outbound]
+    logger.info(f"{filer} filer vi vil behandle")
 
     forespørsler = {}
 
@@ -143,7 +137,7 @@ def skriv_resultat_til_filslusa(host: str, brukernavn: str, fil: str, output: st
     sftp_client.putfo(BytesIO(hash.encode("UTF-8")), f"outbound/{utgående_filnavn}.sha256")
     sftp_client.putfo(BytesIO(data), f"outbound/{utgående_filnavn}")
 
-    logger.info("Verifserer at hash til utgående melding er lik den originale hashen")
+    logger.info("Verifiserer at hash til utgående melding er lik den originale hashen")
     with BytesIO() as remote_csv:
         sftp_client.getfo(f"outbound/{utgående_filnavn}", remote_csv)
         remote_csv.seek(0)
@@ -182,7 +176,7 @@ async def håndter_forespørsler_fra_filslusa(host: str, brukernavn: str):
 
 
 if __name__ == '__main__':
-    print_hei('Hege')
+    logger.info("Starter spissnok")
     try:
         sftp_host = os.getenv("SFTP_HOST")
 
@@ -195,7 +189,6 @@ if __name__ == '__main__':
             asyncio.run(håndter_forespørsler_fra_filslusa(sftp_host, bruker))
             logger.info(f"Fullført håndtering av forespørsel for {bruker}")
     except Exception:
-        logger.exception("Spissnok har ikke spist nok :(")
+        logger.exception("Feil ved håndtering av forespørsler")
 
-    logger.info("You sluse, you luse 🥴")
-    print_ha_det("Hege")
+    logger.info("Avslutter spissnok")
