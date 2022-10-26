@@ -94,11 +94,11 @@ def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, lis
     sftp_client = client.open_sftp()
 
     inbound = sftp_client.listdir(path="inbound")
-    logger.info(f"{len(inbound)} inbound filer")
+    logger.info(f"{len(inbound)} inbound fil(er)")
     outbound = sftp_client.listdir(path="outbound")
-    logger.info(f"{len(outbound)} outbound filer")
+    logger.info(f"{len(outbound)} outbound fil(er)")
     filer = [fil for fil in inbound if utgående_fil(fil) not in outbound]
-    logger.info(f"{filer} filer vi vil behandle")
+    logger.info(f"behandler {len(filer)} fil(er)")
 
     forespørsler = {}
 

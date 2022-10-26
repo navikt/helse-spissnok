@@ -31,3 +31,6 @@ services:
       - ./testresources/.ssh/id_ed25519:/var/run/ssh-keys/id_ed25519:ro
       - ./testresources/known_hosts:/var/run/ssh-keys/known_hosts:ro
       - ./testresources/logs:/secure-logs
+    depends_on:
+      - spokelse.tbd.svc.nais.local
+      - sftp.nav.no
