@@ -19,6 +19,8 @@ spec:
     min: 1
     max: 1
     cpuThresholdPercentage: 90
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 1
   webproxy: true
   secureLogs:
     enabled: true
