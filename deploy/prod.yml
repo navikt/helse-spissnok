@@ -21,6 +21,7 @@ spec:
     cpuThresholdPercentage: 90
     successfulJobsHistoryLimit: 3
     failedJobsHistoryLimit: 1
+    concurrencyPolicy: Forbid
   webproxy: true
   secureLogs:
     enabled: true
