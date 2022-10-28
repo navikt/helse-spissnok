@@ -195,6 +195,7 @@ if __name__ == '__main__':
     if pushgateway is not None:
         registry = CollectorRegistry()
         g = Gauge(name='spissnok_ferdigtid', documentation='sist gang spissnok avsluttet', registry=registry)
+        g.set_to_current_time()
         push_to_gateway(pushgateway, job='spissnok', registry=registry)
 
     logger.info("Avslutter spissnok")
