@@ -32,15 +32,8 @@ spec:
   filesFrom:
     - secret: spissnok-ssh-keys
       mountPath: /var/run/ssh-keys
-  accessPolicy:
-    outbound:
-      rules:
-        - application: prometheus
-          namespace: nais
   env:
     - name: SPORBAR_CLIENT_ID
       value: api://dev-fss.tbd.spokelse/.default
     - name: SFTP_HOST
       value: sftp-q.nav.no
-    - name: PUSH_GATEWAY_ADDRESS
-      value: http://nais-prometheus-pushgateway.nais:9091
