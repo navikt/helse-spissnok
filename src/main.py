@@ -155,14 +155,10 @@ def map_vedtaksperiode_resultat(input: list[dict]):
     with StringIO() as csv_out:
         writer = csv.writer(csv_out)
 
-        writer.writerow(
-            ["fødselsnummer", "fom", "tom", "grad", "gjenståendeSykedager", "utbetaltTidspunkt", "refusjonstype"])
+        writer.writerow(["fødselsnummer", "fom", "tom", "grad"])
         for vedtak in input:
-            sikker_logg.info(f"sender vedtak for {vedtak['fødselsnummer']}, fom={vedtak['fom']},"
-                             + f" tom={vedtak['tom']}, refusjonstype={vedtak['refusjonstype']}")
-            writer.writerow(
-                [vedtak["fødselsnummer"], vedtak["fom"], vedtak["tom"], vedtak["grad"], vedtak["gjenståendeSykedager"],
-                 vedtak["utbetaltTidspunkt"], vedtak["refusjonstype"]])
+            sikker_logg.info(f"sender vedtak for {vedtak['fødselsnummer']}, fom={vedtak['fom']}, tom={vedtak['tom']}")
+            writer.writerow([vedtak["fødselsnummer"], vedtak["fom"], vedtak["tom"], vedtak["grad"]])
         return csv_out.getvalue()
 
 
