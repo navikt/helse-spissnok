@@ -13,6 +13,7 @@ from logging.handlers import RotatingFileHandler
 from pythonjsonlogger import jsonlogger
 import paramiko
 from datetime import datetime
+from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
@@ -36,6 +37,7 @@ sikker_logg.addHandler(sikker_logg_handler)
 
 ssh_key = "/var/run/ssh-keys/id_ed25519"
 known_hosts = "/var/run/ssh-keys/known_hosts"
+
 
 async def hent_access_token():
     token_url = os.getenv("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")
@@ -146,7 +148,8 @@ def skriv_resultat_til_filslusa(host: str, brukernavn: str, fil: str, output: st
             logger.info(f"Hashen til utgående melding er lik original, sletter inbound/{fil}")
             sftp_client.remove(f"inbound/{fil}")
         else:
-            logger.error(f"Hashen for utgående melding er ulik den originale hashen⁉, original={hash} remote={remote_hash}")
+            logger.error(
+                f"Hashen for utgående melding er ulik den originale hashen⁉, original={hash} remote={remote_hash}")
 
     client.close()
 
@@ -186,5 +189,12 @@ if __name__ == '__main__':
             logger.info(f"Fullført håndtering av forespørsel for {bruker}")
     except Exception:
         logger.exception("Feil ved håndtering av forespørsler")
+
+    pushgateway = os.getenv("PUSH_GATEWAY_ADDRESS")
+
+    if pushgateway is not None:
+        registry = CollectorRegistry()
+        g = Gauge(name='spissnok_ferdigtid', documentation='sist gang spissnok avsluttet', registry=registry)
+        push_to_gateway(pushgateway, job='spissnok', registry=registry)
 
     logger.info("Avslutter spissnok")
