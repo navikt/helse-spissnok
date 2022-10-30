@@ -1,3 +1,4 @@
 requests
 paramiko
 python-json-logger
+prometheus_client
