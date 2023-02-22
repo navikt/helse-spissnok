@@ -66,9 +66,9 @@ async def hent_access_token():
     return response.json()["access_token"]
 
 
-async def hent_vedtaksperioder(access_token: str, fødselsnumre: list[str]) -> list[dict]:
+async def hent_vedtaksperioder(spokelse_url: str, access_token: str, fødselsnumre: list[str]) -> list[dict]:
     response = requests.post(
-        "http://spokelse/utbetalinger",
+        "{spokelse_url}/utbetalinger",
         json=fødselsnumre,
         headers={
             "Accept": "application/json",
@@ -165,12 +165,12 @@ def map_vedtaksperiode_resultat(input: list[dict]):
         return csv_out.getvalue()
 
 
-async def håndter_forespørsler_fra_filslusa(host: str, brukernavn: str):
+async def håndter_forespørsler_fra_filslusa(spokelse_url: str, host: str, brukernavn: str):
     inbound = hent_fødselsnumre_fra_filslusa(host, brukernavn)
     access_token = await hent_access_token()
     for file, fødselsnumre in inbound.items():
         logger.info(f"Håndterer fil {file}")
-        vedtaksperioder = await hent_vedtaksperioder(access_token, fødselsnumre)
+        vedtaksperioder = await hent_vedtaksperioder(spokelse_url, access_token, fødselsnumre)
         skriv_resultat_til_filslusa(host, brukernavn, file, map_vedtaksperiode_resultat(vedtaksperioder))
 
 
@@ -178,6 +178,7 @@ if __name__ == '__main__':
     logger.info("Starter spissnok")
     try:
         sftp_host = os.getenv("SFTP_HOST")
+        spokelse_url = os.getenv("SPOKELSE_URL")
 
         with open("/config.json") as config_json:
             jason = json.load(config_json)
@@ -185,7 +186,7 @@ if __name__ == '__main__':
         for sluse in jason:
             bruker = sluse["bruker"]
             logger.info(f"Håndterer forespørsel for {bruker}")
-            asyncio.run(håndter_forespørsler_fra_filslusa(sftp_host, bruker))
+            asyncio.run(håndter_forespørsler_fra_filslusa(spokelse_url, sftp_host, bruker))
             logger.info(f"Fullført håndtering av forespørsel for {bruker}")
     except Exception:
         logger.exception("Feil ved håndtering av forespørsler")

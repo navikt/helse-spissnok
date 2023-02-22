@@ -35,5 +35,7 @@ spec:
   env:
     - name: SPORBAR_CLIENT_ID
       value: api://prod-gcp.tbd.spokelse/.default
+    - name: SPOKELSE_URL
+      value: https://spokelse.intern.nav.no
     - name: SFTP_HOST
       value: sftp.nav.no
