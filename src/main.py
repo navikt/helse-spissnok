@@ -68,7 +68,7 @@ async def hent_access_token():
 
 async def hent_vedtaksperioder(access_token: str, fødselsnumre: list[str]) -> list[dict]:
     response = requests.post(
-        "http://spokelse.tbd.svc.nais.local/utbetalinger",
+        "http://spokelse/utbetalinger",
         json=fødselsnumre,
         headers={
             "Accept": "application/json",
