@@ -41,7 +41,7 @@ spec:
     - name: SPORBAR_CLIENT_ID
       value: api://dev-gcp.tbd.spokelse/.default
     - name: SPOKELSE_URL
-      value: https://spokelse.dev.intern.nav.no
+      value: https://spokelse.intern.dev.nav.no
     - name: SFTP_HOST
       value: sftp-q.nav.no
     - name: PUSH_GATEWAY_ADDRESS
