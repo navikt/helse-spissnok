@@ -45,4 +45,4 @@ spec:
     - name: SFTP_HOST
       value: sftp-q.nav.no
     - name: PUSH_GATEWAY_ADDRESS
-      value: http://nais-prometheus-pushgateway.nais.svc.nais.local:9091
+      value: http://prometheus-pushgateway.nais-system.svc.nais.local:9091
