@@ -67,6 +67,7 @@ async def hent_access_token():
 
 
 async def hent_vedtaksperioder(spokelse_url: str, access_token: str, fødselsnumre: list[str]) -> list[dict]:
+    logger.info(f"henter utbetalinger fra {spokelse_url}")
     response = requests.post(
         f"{spokelse_url}/utbetalinger",
         json=fødselsnumre,
@@ -90,6 +91,7 @@ def utgående_fil(filnavn: str):
 
 
 def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, list[str]]:
+    logger.info(f"kobler til {host}")
     client = paramiko.SSHClient()
     client.load_host_keys(known_hosts)
     client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename=ssh_key))
@@ -125,6 +127,7 @@ def hent_fødselsnumre_fra_filslusa(host: str, brukernavn: str) -> dict[str, lis
 
 
 def skriv_resultat_til_filslusa(host: str, brukernavn: str, fil: str, output: str):
+    logger.info(f"kobler til {host}")
     client = paramiko.SSHClient()
     client.load_host_keys(known_hosts)
     client.connect(host, username=brukernavn, pkey=paramiko.ed25519key.Ed25519Key(filename=ssh_key))
