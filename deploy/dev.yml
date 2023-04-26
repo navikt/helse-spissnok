@@ -34,6 +34,12 @@ spec:
       mountPath: /var/run/ssh-keys
   accessPolicy:
     outbound:
+      external:
+        - host: sftp-q.nav.no
+          ports:
+            - name: SFTP
+              port: 22
+              protocol: TCP
       rules:
         - application: prometheus
           namespace: nais
@@ -41,7 +47,7 @@ spec:
     - name: SPORBAR_CLIENT_ID
       value: api://dev-gcp.tbd.spokelse/.default
     - name: SPOKELSE_URL
-      value: https://spokelse.intern.dev.nav.no
+      value: http://spokelse
     - name: SFTP_HOST
       value: sftp-q.nav.no
     - name: PUSH_GATEWAY_ADDRESS
