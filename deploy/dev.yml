@@ -50,5 +50,3 @@ spec:
       value: http://spokelse
     - name: SFTP_HOST
       value: sftp-q.nav.no
-    - name: PUSH_GATEWAY_ADDRESS
-      value: http://prometheus-pushgateway.nais-system.svc.nais.local:9091
