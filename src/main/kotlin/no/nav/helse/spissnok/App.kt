@@ -36,27 +36,16 @@ fun main() {
     val clientSecret = env.getValue("AZURE_APP_CLIENT_SECRET")
 
     val spissnok = Spissnok(config, sftpHost, spokelseUrl, tokenUrl, clientId, scope, clientSecret)
-    spissnok.kjør()
 
-    // App(env).run()
+    if (env["KJOR_SOM_JOBB"]?.equals("true", true) == true) return spissnok.kjør()
+
+    App(env, spissnok).run()
 }
 
-private class App(private val env: Map<String, String>) : RapidsConnection.StatusListener {
-    private val logger = Logg.ny(this::class)
-
+private class App(env: Map<String, String>, spissnok: Spissnok) : RapidsConnection.StatusListener {
     private val rapidsConnection = RapidApplication.create(env)
 
     init {
-        val config = mapper.readTree(File("/config.json")).map { it.path("bruker").asText() }
-        val sftpHost = env.getValue("SFTP_HOST")
-        val spokelseUrl = env.getValue("SPOKELSE_URL")
-        val tokenUrl = env.getValue("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")
-        val clientId = env.getValue("AZURE_APP_CLIENT_ID")
-        val scope = env.getValue("SPORBAR_CLIENT_ID")
-        val clientSecret = env.getValue("AZURE_APP_CLIENT_SECRET")
-
-        val spissnok = Spissnok(config, sftpHost, spokelseUrl, tokenUrl, clientId, scope, clientSecret)
-
         rapidsConnection
             .apply { SpissnokRiver(this, spissnok) }
             .register(this)
@@ -70,8 +59,12 @@ private class App(private val env: Map<String, String>) : RapidsConnection.Statu
         init {
             River(rapidsConnection)
                 .validate {
-                    it.demandValue("@event_name", "hel_time")
-                    it.requireValue("time", "14")
+                    if (System.getenv("NAIS_CLUSTER_NAME") == "dev-gcp") {
+                        it.demandValue("@event_name", "halv_time")
+                    } else {
+                        it.demandValue("@event_name", "hel_time")
+                        it.requireValue("time", "14")
+                    }
                 }.register(this)
         }
 
