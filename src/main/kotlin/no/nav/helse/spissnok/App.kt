@@ -146,13 +146,13 @@ private class Spissnok(
 
         DataOutputStream(conn.outputStream).use { it.writeBytes(data) }
 
-        val readStream = { cis: InputStream -> cis.bufferedReader().use { it.readText() } }
+        val readStream = { cis: InputStream? -> cis?.bufferedReader()?.use { it.readText() } }
 
         val responseCode = conn.responseCode
         if (responseCode !in 200..299) {
             logger
                 .offentligError("kunne ikke sende POST til $url, response code=$responseCode")
-                .privatError("kunne ikke sende POST til $url, response code=$responseCode:\n${readStream(conn.errorStream)}")
+                .privatError("kunne ikke sende POST til $url, response code=$responseCode:\nerror stream=${readStream(conn.errorStream)}\ninput stream=${readStream(conn.inputStream)}")
             return null
         }
         return readStream(conn.inputStream)
