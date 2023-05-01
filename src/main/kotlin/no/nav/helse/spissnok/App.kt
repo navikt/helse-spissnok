@@ -56,6 +56,7 @@ private class App(env: Map<String, String>, spissnok: Spissnok) : RapidsConnecti
     }
 
     private class SpissnokRiver(rapidsConnection: RapidsConnection, private val spissnok: Spissnok) : River.PacketListener {
+        private val logg = Logg.ny(this::class)
         init {
             River(rapidsConnection)
                 .validate {
@@ -69,7 +70,11 @@ private class App(env: Map<String, String>, spissnok: Spissnok) : RapidsConnecti
         }
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
-            spissnok.kjør()
+            try {
+                spissnok.kjør()
+            } catch (err: Exception) {
+                logg.error("Alvorlig feil under kjøring av spissnok: ${err.message}", err)
+            }
         }
     }
 }
