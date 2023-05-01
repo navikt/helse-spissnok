@@ -1,8 +1,4 @@
-FROM navikt/python:3.9
+FROM navikt/java:17
 
-COPY requirements.txt .
-USER apprunner
-RUN pip install --user -r requirements.txt
-
-COPY src/ .
+COPY build/libs/*.jar ./
 COPY config.json /
