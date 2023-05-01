@@ -123,7 +123,7 @@ private class Spissnok(
     }
 
     private fun hentVedtaksperioder(spokelseUrl: String, accessToken: String, fnumre: List<String>): List<UtbetalingDTO>? {
-        logger.info("henter utbetalinger fra $spokelseUrl")
+        logger.info("henter utbetalinger for ${fnumre.size} personer fra $spokelseUrl")
         val payload = mapper.writeValueAsString(fnumre)
         return httpPost("$spokelseUrl/utbetalinger", payload, mapOf(
             "Accept" to "application/json",
