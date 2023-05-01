@@ -11,8 +11,9 @@ import net.schmizz.sshj.sftp.SFTPClient
 import net.schmizz.sshj.transport.verification.OpenSSHKnownHosts
 import no.nav.helse.rapids_rivers.*
 import no.nav.helse.spissnok.UtbetalingDTO.Companion.tilCsv
-import org.intellij.lang.annotations.Language
-import java.io.*
+import java.io.DataOutputStream
+import java.io.File
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
@@ -66,6 +67,10 @@ private class App(env: Map<String, String>, spissnok: Spissnok) : RapidsConnecti
                         it.demandValue("@event_name", "hel_time")
                         it.requireValue("time", "14")
                     }
+                }.register(this)
+            River(rapidsConnection)
+                .validate {
+                    it.demandValue("@event_name", "kjør_spissnok")
                 }.register(this)
         }
 
