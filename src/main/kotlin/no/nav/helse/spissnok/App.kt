@@ -136,8 +136,8 @@ private class Spissnok(
         conn.setRequestProperty("Content-Length", "${data.length}")
         headers.forEach { (key, value) -> conn.setRequestProperty(key, value) }
         conn.useCaches = false
-        conn.connectTimeout = Duration.ofSeconds(1).toMillis().toInt()
-        conn.readTimeout = Duration.ofSeconds(5).toMillis().toInt()
+        conn.connectTimeout = Duration.ofSeconds(5).toMillis().toInt()
+        conn.readTimeout = Duration.ofSeconds(10).toMillis().toInt()
 
         DataOutputStream(conn.outputStream).use { it.writeBytes(data) }
 
