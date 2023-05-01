@@ -1,5 +1,5 @@
-apiVersion: nais.io/v1
-kind: Naisjob
+apiVersion: nais.io/v1alpha1
+kind: Application
 metadata:
   name: spissnok
   namespace: tbd
