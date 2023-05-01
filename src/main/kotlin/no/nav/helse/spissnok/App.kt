@@ -152,7 +152,7 @@ private class Spissnok(
         if (responseCode !in 200..299) {
             logger
                 .offentligError("kunne ikke sende POST til $url, response code=$responseCode")
-                .privatError("kunne ikke sende POST til $url, response code=$responseCode:\nerror stream=${readStream(conn.errorStream)}\ninput stream=${readStream(conn.inputStream)}")
+                .privatError("kunne ikke sende POST til $url, response code=$responseCode:\nerror stream=${readStream(conn.errorStream)}")
             return null
         }
         return readStream(conn.inputStream)
