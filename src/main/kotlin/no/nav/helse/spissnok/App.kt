@@ -151,7 +151,7 @@ private class Spissnok(
         if (responseCode !in 200..299) {
             logger
                 .offentligError("kunne ikke hente access token, response code=$responseCode")
-                .privatError("kunne ikke hente access token, response code=$responseCode:\n${readStream(conn.errorStream)}")
+                .privatError("kunne ikke hente access token, response code=$responseCode:\n${readStream(conn.errorStream)}\nrequest:$data")
             return null
         }
         return readStream(conn.inputStream)
