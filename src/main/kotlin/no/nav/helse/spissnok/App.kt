@@ -109,14 +109,10 @@ private class Spissnok(
     }
 
     private fun accessToken(tokenUrl: String, clientId: String, scope: String, clientSecret: String): String? {
-        @Language("JSON")
-        val payload = """{
-            "client_id": "$clientId",
-            "scope": "$scope",
-            "grant_type": "client_credentials",
-            "client_secret": "$clientSecret"
-        }"""
-        return httpPost(tokenUrl, payload)?.let {
+        val payload = """client_id=$clientId&scope=$scope&grant_type=client_credentials&client_secret=$clientSecret"""
+        return httpPost(tokenUrl, payload, mapOf(
+            "Content-Type" to "application/x-www-form-urlencoded"
+        ))?.let {
             mapper.readTree(it).path("access_token").asText()
         }
     }
@@ -126,6 +122,7 @@ private class Spissnok(
         val payload = mapper.writeValueAsString(fnumre)
         return httpPost("$spokelseUrl/utbetalinger", payload, mapOf(
             "Accept" to "application/json",
+            "Content-Type" to "application/json",
             "Authorization" to "Bearer $accessToken"
         ))?.let {
             mapper.readValue<List<UtbetalingDTO>>(it)
@@ -136,7 +133,6 @@ private class Spissnok(
         val conn = URL(url).openConnection() as HttpURLConnection
         conn.requestMethod = "POST"
         conn.doOutput = true
-        conn.setRequestProperty("Content-Type", "application/json")
         conn.setRequestProperty("Content-Length", "${data.length}")
         headers.forEach { (key, value) -> conn.setRequestProperty(key, value) }
         conn.useCaches = false
@@ -150,8 +146,8 @@ private class Spissnok(
         val responseCode = conn.responseCode
         if (responseCode !in 200..299) {
             logger
-                .offentligError("kunne ikke hente access token, response code=$responseCode")
-                .privatError("kunne ikke hente access token, response code=$responseCode:\n${readStream(conn.errorStream)}\nrequest:$data")
+                .offentligError("kunne ikke sende POST til $url, response code=$responseCode")
+                .privatError("kunne ikke sende POST til $url, response code=$responseCode:\n${readStream(conn.errorStream)}")
             return null
         }
         return readStream(conn.inputStream)
