@@ -47,7 +47,7 @@ private class App(env: Map<String, String>, spissnok: Spissnok) : RapidsConnecti
 
     init {
         rapidsConnection
-            //.apply { SpissnokRiver(this, spissnok) }
+            .apply { SpissnokRiver(this, spissnok) }
             .register(this)
     }
 

@@ -9,11 +9,10 @@ spec:
   image: {{image}}
   resources:
     limits:
-      cpu: 200m
-      memory: 128Mi
+      memory: 2048Mi
     requests:
       cpu: 50m
-      memory: 128Mi
+      memory: 512Mi
   port: 8080
   strategy:
     type: Recreate
