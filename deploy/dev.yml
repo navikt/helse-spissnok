@@ -48,9 +48,6 @@ spec:
             - name: SFTP
               port: 22
               protocol: TCP
-      rules:
-        - application: prometheus
-          namespace: nais
   env:
     - name: KAFKA_RAPID_TOPIC
       value: tbd.rapid.v1
