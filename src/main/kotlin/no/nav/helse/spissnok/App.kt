@@ -65,7 +65,7 @@ private class App(env: Map<String, String>, spissnok: Spissnok) : RapidsConnecti
                         it.demandValue("@event_name", "halv_time")
                     } else {
                         it.demandValue("@event_name", "hel_time")
-                        it.requireValue("time", "14")
+                        it.demandValue("time", 14)
                     }
                 }.register(this)
             River(rapidsConnection)
