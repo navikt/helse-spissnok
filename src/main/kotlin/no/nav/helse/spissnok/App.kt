@@ -74,8 +74,15 @@ private class App(env: Map<String, String>, spissnok: Spissnok) : RapidsConnecti
                 }.register(this)
         }
 
+        override fun onError(problems: MessageProblems, context: MessageContext) {
+            logg
+                .offentligError("Forstod ikke melding (se sikkerlogg for detaljer)")
+                .privatError("Forstod ikke melding:\n${problems.toExtendedReport()}")
+        }
+
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
             try {
+                logg.info("kjører spissnok")
                 spissnok.kjør()
             } catch (err: Exception) {
                 logg.error("Alvorlig feil under kjøring av spissnok: ${err.message}", err)
