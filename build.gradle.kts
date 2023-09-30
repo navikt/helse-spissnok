@@ -1,7 +1,7 @@
-val junitJupiterVersion = "5.9.3"
+val junitJupiterVersion = "5.10.0"
 
 plugins {
-    kotlin("jvm") version "1.8.21"
+    kotlin("jvm") version "1.9.10"
 }
 
 repositories {
@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.navikt:rapids-and-rivers:2023050308441683096263.f5a276d7bd28")
+    implementation("com.github.navikt:rapids-and-rivers:2023093008351696055717.ffdec6aede3d")
     implementation("com.hierynomus:sshj:0.35.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
@@ -38,9 +38,8 @@ tasks {
 
         doLast {
             configurations.runtimeClasspath.get().forEach {
-                val file = File("$buildDir/libs/${it.name}")
-                if (!file.exists())
-                    it.copyTo(file)
+                val file = File("${layout.buildDirectory.get()}/libs/${it.name}")
+                if (!file.exists()) it.copyTo(file)
             }
         }
     }
@@ -53,6 +52,6 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "8.1.1"
+        gradleVersion = "8.3"
     }
 }
