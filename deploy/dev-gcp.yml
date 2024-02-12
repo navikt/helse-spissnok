@@ -47,9 +47,7 @@ spec:
       external:
         - host: sftp-q.nav.no
           ports:
-            - name: SFTP
-              port: 22
-              protocol: TCP
+            - port: 22
   env:
     - name: KAFKA_RAPID_TOPIC
       value: tbd.rapid.v1
