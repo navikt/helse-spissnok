@@ -1,5 +1,7 @@
 .idea
 build
+.gradle
+out
 venv
 
 testresources/outbound
